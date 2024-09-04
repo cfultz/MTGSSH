@@ -1,8 +1,13 @@
 #!/bin/bash
 
-# Fetch a random Magic: The Gathering card and display some details
+# Function to wrap text at a specific width
+wrap_text() {
+    local text="$1"
+    local width="$2"
+    echo "$text" | fold -s -w "$width"
+}
 
-# Fetch random card data from Scryfall
+# Fetch a random Magic: The Gathering card and display some details
 CARD_DATA=$(curl -s https://api.scryfall.com/cards/random)
 
 # Check if the card has multiple faces
@@ -23,12 +28,16 @@ else
   CARD_IMAGE=$(echo "$CARD_DATA" | jq -r '.image_uris.art_crop')
 fi
 
-# Display the card information
+# Set desired text width
+TEXT_WIDTH=60
+
+# Display the card information with wrapped text
 echo "Random Magic: The Gathering Card:"
 echo "-----------------------------------"
-echo "Name: $CARD_NAME"
-echo "Type: $CARD_TYPE"
-echo "Text: $CARD_TEXT"
+echo "Name: $(wrap_text "$CARD_NAME" $TEXT_WIDTH)"
+echo "Type: $(wrap_text "$CARD_TYPE" $TEXT_WIDTH)"
+echo "Text:"
+wrap_text "$CARD_TEXT" $TEXT_WIDTH
 echo
 
 # Download the card image (art only)
